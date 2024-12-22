@@ -72,8 +72,47 @@ function strStr_with_rolling_hash(haystack: string, needle: string): number {
   return -1;
 }
 
+function minimizeResult(expression: string): string {
+  const [num1, num2] = expression.split("+"); // Split into two parts
+  let minValue = Infinity;
+  let result = "";
+
+  // Try all possible positions for parentheses
+  for (let i = 0; i < num1.length; i++) {
+    // Position for '(' in num1
+    for (let j = 1; j <= num2.length; j++) {
+      // Position for ')' in num2
+      // Split num1 and num2 into parts
+      const num1Left = num1.substring(0, i); // Before '('
+      const num1Right = num1.substring(i); // After '('
+      const num2Left = num2.substring(0, j); // Before ')'
+      const num2Right = num2.substring(j); // After ')'
+
+      // Calculate the expression value
+      const leftMultiplier = num1Left ? parseInt(num1Left) : 1;
+      const middleSum = parseInt(num1Right) + parseInt(num2Left);
+      const rightMultiplier = num2Right ? parseInt(num2Right) : 1;
+
+      const currentValue = leftMultiplier * middleSum * rightMultiplier;
+
+      // Update the result if a smaller value is found
+      if (currentValue < minValue) {
+        minValue = currentValue;
+        result = `${num1Left}(${num1Right}+${num2Left})${num2Right}`;
+      }
+    }
+  }
+
+  return result;
+}
+
 describe("28. Find the Index of the First Occurrence in a String", () => {
   describe("Brute Force", () => {
+    it("Happy Path", () => {
+      const expression = "12+34";
+      expect(minimizeResult(expression)).toStrictEqual("1(2+3)4");
+    });
+
     it("Happy Path", () => {
       expect(strStr("sadbutsad", "sad")).toStrictEqual(0);
     });
